@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Net;
+using NUnit.Framework;
 using TechTalk.SpecFlow;
 
 namespace CheckoutKata.Specs
@@ -6,22 +8,32 @@ namespace CheckoutKata.Specs
     [Binding]
     public class BasketSteps
     {
+        private HttpWebResponse _webResponse;
+
         [Given(@"I have an empty basket")]
         public void GivenIHaveAnEmptyBasket()
         {
-            ScenarioContext.Current.Pending();
+            var url = new Uri("http://mia-checkout-kata.local/baskets");
+
+            _webResponse = Browser.Post(url);
+
+            Assert.That(_webResponse.StatusCode, Is.EqualTo(HttpStatusCode.Created));
         }
-        
+
         [When(@"I request my basket")]
         public void WhenIRequestMyBasket()
         {
-            ScenarioContext.Current.Pending();
+            var basketUrl = _webResponse.GetResponseHeader("Location");
+            _webResponse = Browser.Get(basketUrl);
+            Assert.That(_webResponse.StatusCode, Is.EqualTo(HttpStatusCode.OK));
         }
-        
+
         [Then(@"the basket price should be (.*)")]
         public void ThenTheBasketPriceShouldBe(int price)
         {
-            ScenarioContext.Current.Pending();
+            var body = Browser.ReadResponseStream(_webResponse);
+
+            Assert.That(body, Is.EqualTo(price.ToString()));
         }
     }
 }

@@ -1,6 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Net;
+﻿using System.Net;
 using NUnit.Framework;
 using TechTalk.SpecFlow;
 
@@ -22,11 +20,7 @@ namespace CheckoutKata.Specs
         [Then(@"I get a response")]
         public void ThenIGetAResponse()
         {
-
-            var responseStream = _webResponse.GetResponseStream();
-            Assert.IsNotNull(responseStream);
-            var streamReader = new StreamReader(responseStream);
-            var response = streamReader.ReadToEnd();
+            var response = Browser.ReadResponseStream(_webResponse);
 
             Assert.That(_webResponse.StatusCode, Is.EqualTo(HttpStatusCode.OK));
             Assert.That(response, Is.EqualTo("Welcome"));
